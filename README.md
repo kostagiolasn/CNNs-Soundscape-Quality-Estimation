@@ -31,7 +31,8 @@ analysis library
    #### **Data Preparation**
    1. Change the frequency of the audio files into 16000 Hz using _changeFreq.py_
    2. Convert your audio files into pseudocolored RGB or grayscale spectrogram images using _generateSpectrograms.py_
-   Data should be pseudo-colored RGB spectrogram images of size 227x227 as shown in Fig2
+   Data should be pseudo-colored RGB spectrogram images of size 227x227 as shown in Fig1
     <img src="https://github.com/MikeMpapa/CNNs-Speech-Music-Discrimination/blob/master/sampleIMg.png" width="227" height="227">
-    <figcaption>Fig2. - Sample RGB Spectrogram</figcaption>
+    
+    <figcaption>Fig1. - Sample RGB Spectrogram</figcaption>
    3. Distribute the generated spectrograms to their respective classes using _fixDataset.sh_
