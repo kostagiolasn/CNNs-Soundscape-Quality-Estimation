@@ -7,6 +7,7 @@ import sys
 import os
 import time
 import random
+import hashable
 
 import numpy as np
 import theano
@@ -187,7 +188,7 @@ def build_cnn(input_var=None):
     # Another convolution with 32 5x5 kernels, and another 2x2 pooling:
     # we changed that to 3x3 (Thodoris)
     network = lasagne.layers.Conv2DLayer(
-            network, num_filters=32, filter_size=(5, 5),
+            network, num_filters=32, filter_size=(3, 3),
             nonlinearity=lasagne.nonlinearities.rectify)
     network = lasagne.layers.MaxPool2DLayer(network, pool_size=(2, 2))
 
@@ -372,7 +373,7 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 		# Descent (SGD) with Nesterov momentum, but Lasagne offers plenty more.
 		params = lasagne.layers.get_all_params(network, trainable=True)
 		updates = lasagne.updates.nesterov_momentum(
-				loss, params, learning_rate=0.002, momentum=0.5)
+				loss, params, learning_rate=0.01, momentum=0.9)
 
 		# Create a loss expression for validation/testing. The crucial difference
 		# here is that we do a deterministic forward pass through the network,
@@ -412,8 +413,6 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 			val_pres = 0
 			val_batches = 0
 			preds = []
-			true = 0
-			count = 0
 			for batch in iterate_minibatches(X_val, y_val, instanceNames_val, 1, shuffle=False):
 				
 				inputs, targets, instanceNamesTemp = batch
@@ -421,20 +420,11 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 				val_err += err
 				val_acc += acc
 				
-				#print(temp_preds)
-				#print(targets)
-				if(temp_preds > 0.5 and targets == 1):
-					true += 1
-				elif(temp_preds < 0.5 and targets == 0):
-					true += 1
-				count += 1
 				preds.append(temp_preds[0][0].tolist())
 
 				val_batches += 1
 
 			val_recall, val_precision = compute_recall_precision(y_val, preds)
-			print("printing the alternative accuracy")
-			print(true/count)
 			# Then we print the results for this epoch:
 			print("Epoch {} of {} took {:.3f}s".format(
 				epoch + 1, num_epochs, time.time() - start_time))
@@ -460,8 +450,6 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 			err, acc, temp_preds = val_fn(inputs, targets)
 			tst_err += err
 			tst_acc += acc
-			#print(temp_preds)
-			#print(targets)
 			
 			preds.append(temp_preds[0][0].tolist())
 			
