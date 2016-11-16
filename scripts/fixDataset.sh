@@ -4,6 +4,7 @@
 dataset='../../../../Dataset/';
 path1='./complete_dataset/';
 
+<<<<<<< HEAD
 # The first argument is the path where the dataset consisting of the WAV spectrograms will
 # be stored.
 
@@ -33,6 +34,20 @@ suffix7='_rnoise13.png'
 suffix8='_rnoise21.png'
 suffix9='_rnoise22.png'
 suffix10='_rnoise23.png'
+=======
+# The first argument is the path where all the images after augmentation are stored
+# The second argument is the path where the dataset will be distributed in class folders
+dataset=$1
+path1=$2
+
+#path2='../../'
+#literalNegativeClass='not_'
+
+# Here are the suffices of the dataset images after augmentation
+suffix1='.jpg'
+suffix2='_02A.jpg'
+suffix3='_02B.jpg'
+>>>>>>> a2a9eb7d152576e80ef84551219b8a4d10d2c4d4
 
 echo ">>> This is the script for distributing the dataset images (after augmentation)"
 echo "    to their respective class folder"
@@ -49,6 +64,7 @@ until $DONE; do
 		echo ">>> Images belonging to class $REPLY were distributed successfully"
 		echo
 
+<<<<<<< HEAD
 		prefixPositiveClass=$path1/$REPLY/$REPLY
 
 		#echo $prefixPositiveClass
@@ -95,10 +111,35 @@ until $DONE; do
 			#cp $png8 $dataset/$REPLY/$REPLY/$f$suffix8
 			#cp $png9 $dataset/$REPLY/$REPLY/$f$suffix9
 			#cp $png10 $dataset/$REPLY/$REPLY/$f$suffix10
+=======
+		prefixPositiveClass=$path1$REPLY/$REPLY
+
+		if [ ! -d "$$path1$REPLY" ]; then
+			mkdir -p $$path1$REPLY
+		fi
+
+		if [ ! -d "$prefixPositiveClass" ]; then
+			mkdir -p $prefixPositiveClass
+		fi
+
+		cd $prefixPositiveClass
+		for f in *.wav; do
+			f1=${f%.wav}
+			jpg1=$dataset$f1$suffix1;
+			jpg2=$dataset$f1$suffix2;
+			jpg3=$dataset$f1$suffix3;
+			echo $jpg1
+			echo $jpg2
+			echo $jpg3
+			#cp $jpg1 $f$suffix1
+			#cp $jpg2 $f$suffix2
+			#cp $jpg3 $f$suffix3
+>>>>>>> a2a9eb7d152576e80ef84551219b8a4d10d2c4d4
 		done
 
 		prefixNegativeClass=$path2$REPLY/$literalNegativeClass$REPLY
 
+<<<<<<< HEAD
 		if [ ! -d "$dataset$prefixNegativeClass" ]; then
 			mkdir -p $dataset/$REPLY/$literalNegativeClass$REPLY
 		fi
@@ -127,6 +168,24 @@ until $DONE; do
 			#cp $png8 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix8
 			#cp $png9 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix9
 			#cp $png10 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix10
+=======
+		if [ ! -d "$prefixNegativeClass" ]; then
+			mkdir -p $prefixNegativeClass
+		fi
+		
+		cd $prefixNegativeClass
+		for f in *.wav; do
+			f1=${f%.wav}
+			jpg1=$dataset$f1$suffix1;
+			jpg2=$dataset$f1$suffix2;
+			jpg3=$dataset$f1$suffix3;
+			echo $jpg1
+			echo $jpg2
+			echo $jpg3
+			#cp $jpg1 $f$suffix1
+			#cp $jpg2 $f$suffix2
+			#cp $jpg3 $f$suffix3
+>>>>>>> a2a9eb7d152576e80ef84551219b8a4d10d2c4d4
 		done
 	fi
 done
