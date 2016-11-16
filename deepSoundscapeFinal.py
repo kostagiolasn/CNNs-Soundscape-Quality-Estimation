@@ -36,7 +36,7 @@ def defineClassToPathDict(classesPositive):
 		if classesPositive[i] == 'voice_children':
 			classesPositive[i] = 'voice_(children)'
 	
-	initialPath = '/home/nikos/Desktop/NCSR Demokritos/Soundscape Quality Estimation using Deep Learning/Documents/soundscapeanalysis/scripts/complete_dataset'
+	initialPath = '/home/nikos/Desktop/NCSRDemokritos/CNNs-Soundscape-Quality-Estimation/data/complete_dataset'
 	negativeClassString = 'not_'
 	classesPositiveNegative = []
 	for i in classesPositive:
@@ -55,11 +55,21 @@ def defineClassToPathDict(classesPositive):
 
 def mapInstancesToMultipleLabels(classToPathDict):
 	
-	pathToWavs = '/home/nikos/Desktop/NCSR Demokritos/Soundscape Quality Estimation using Deep Learning/Documents/soundscapeanalysis/wav2/'
-	jpgInstances = [i+'.jpg' for i in os.listdir(pathToWavs)]
-	jpg_02AInstances = [i+'_02A.jpg' for i in os.listdir(pathToWavs)]
-	jpg_02BInstances = [i+'_02B.jpg' for i in os.listdir(pathToWavs)]
-	jpgInstances = jpgInstances + jpg_02AInstances + jpg_02BInstances
+	pathToWavs = '/home/nikos/Desktop/NCSRDemokritos/CNNs-Soundscape-Quality-Estimation/Documents/soundscapeanalysis/wav2'
+	#jpgInstances = [i+'.jpg' for i in os.listdir(pathToWavs)]
+	pngInstances = [i+'.png' for i in os.listdir(pathToWavs)]
+	png_rnoise21Instances = [i+'_rnoise21.png' for i in os.listdir(pathToWavs)]
+	png_rnoise22Instances = [i+'_rnoise22.png' for i in os.listdir(pathToWavs)]
+	png_rnoise23Instances = [i+'_rnoise23.png' for i in os.listdir(pathToWavs)]
+	png_rnoise11Instances = [i+'_rnoise11.png' for i in os.listdir(pathToWavs)]
+	png_rnoise12Instances = [i+'_rnoise12.png' for i in os.listdir(pathToWavs)]
+	png_rnoise13Instances = [i+'_rnoise13.png' for i in os.listdir(pathToWavs)]
+	png_rnoise01Instances = [i+'_rnoise01.png' for i in os.listdir(pathToWavs)]
+	png_rnoise02Instances = [i+'_rnoise02.png' for i in os.listdir(pathToWavs)]
+	png_rnoise03Instances = [i+'_rnoise03.png' for i in os.listdir(pathToWavs)]
+	#jpg_02AInstances = [i+'_02A.jpg' for i in os.listdir(pathToWavs)]
+	#jpg_02BInstances = [i+'_02B.jpg' for i in os.listdir(pathToWavs)]
+	jpgInstances = pngInstances + png_rnoise21Instances + png_rnoise21Instances + png_rnoise22Instances + png_rnoise23Instances + png_rnoise11Instances + png_rnoise12Instances + png_rnoise13Instances + png_rnoise01Instances + png_rnoise02Instances + png_rnoise03Instances
 	instancesToMultipleLabelsMap = {}.fromkeys(jpgInstances)
 
 	instancesPerClass = []
@@ -98,21 +108,21 @@ def load_dataset(className, classToPathDict, instancesToMultipleLabelsMap, r_trn
 	X_P = []
 	labels = []
 	instanceNames = []
-	
+		
 	for i in instancesToMultipleLabelsMap:
 		if not instancesToMultipleLabelsMap[i]:
 			continue
 		if positiveClass in instancesToMultipleLabelsMap[i]:
 			img = Image.open(classToPathDict[positiveClass] +'/'+ i)
 			img = np.asarray(img, dtype='float32') / 255
-			img = img.transpose(2,0,1).reshape(3,PIXELS,PIXELS)
+			img = img.transpose(2,0,1).reshape(4,PIXELS,PIXELS)
 			X_P.append(img)
 			instanceNames.append(i)
 			labels.append(1)
 		if negativeClass in instancesToMultipleLabelsMap[i]:
 			img = Image.open(classToPathDict[negativeClass] +'/'+ i)
 			img = np.asarray(img, dtype='float32') / 255
-			img = img.transpose(2,0,1).reshape(3,PIXELS,PIXELS)
+			img = img.transpose(2,0,1).reshape(4,PIXELS,PIXELS)
 			X_N.append(img)
 			instanceNames.append(i)
 			labels.append(0)
@@ -159,6 +169,33 @@ def load_dataset(className, classToPathDict, instancesToMultipleLabelsMap, r_trn
 	# Return results
 	return inputs[trn], labels[trn], inputs[vld], labels[vld], inputs[tst], labels[tst], instanceNames[trn], instanceNames[vld], instanceNames[tst]
 	
+def build_simple(input_var=None):
+	network = lasagne.layers.InputLayer(shape=(None, 3, 227, 227), input_var=input_var)
+	
+	network = lasagne.layers.DenseLayer(lasagne.layers.dropout(network, p=.5), num_units=100, nonlinearity=lasagne.nonlinearities.rectify)
+	
+	network = lasagne.layers.DenseLayer(lasagne.layers.dropout(network, p=.5), num_units=1,nonlinearity=lasagne.nonlinearities.sigmoid)
+
+def build_cnnrnn(input_var=None):
+	
+    network = lasagne.layers.InputLayer(shape=(None, 3, 227, 227), input_var=input_var)
+                                        
+    network = lasagne.layers.Conv2DLayer(network, num_filters=96, filter_size=(7,7), pad=0, flip_filters=False,stride=2,nonlinearity=lasagne.nonlinearities.rectify)
+    network = lasagne.layers.Pool2DLayer(network, pool_size = (3,3), stride = 2, mode = 'max')
+    network = lasagne.layers.LocalResponseNormalization2DLayer(network, alpha = 0.0001, beta = 0.75, n = 5)
+    network = lasagne.layers.Conv2DLayer(network, num_filters = 384, filter_size = (5,5), pad = 0, flip_filters=False,stride=2,nonlinearity=lasagne.nonlinearities.rectify)
+    network = lasagne.layers.Pool2DLayer(network, pool_size = (3,3), stride = 2, mode = 'max')
+    network = lasagne.layers.LocalResponseNormalization2DLayer(network, alpha = 0.0001, beta = 0.75, n = 5)
+    network = lasagne.layers.Conv2DLayer(network, num_filters=512, filter_size=(3,3), pad=1, flip_filters=False,stride=2,nonlinearity=lasagne.nonlinearities.rectify)
+    network = lasagne.layers.Conv2DLayer(network, num_filters=512, filter_size=(3,3), pad=1, flip_filters=False,stride=2,nonlinearity=lasagne.nonlinearities.rectify)
+    #network = lasagne.layers.Conv2DLayer(network, num_filters=384, filter_size=(3,3), pad=1, flip_filters=False,stride=2,nonlinearity=lasagne.nonlinearities.rectify)
+    network = lasagne.layers.Pool2DLayer(network, pool_size = (3,3), stride = 2, mode = 'max')
+    network = lasagne.layers.DenseLayer(lasagne.layers.dropout(network, p=.5), num_units=4096, nonlinearity=lasagne.nonlinearities.rectify)
+    network = lasagne.layers.DenseLayer(lasagne.layers.dropout(network, p=.5), num_units=101, nonlinearity=lasagne.nonlinearities.rectify)
+    network = lasagne.layers.DenseLayer(lasagne.layers.dropout(network, p=.0), num_units=1, nonlinearity=lasagne.nonlinearities.sigmoid)
+    
+	
+    return network
     
 def build_cnn(input_var=None):
     #  As a model we'll create a CNN of two convolution + pooling stages
@@ -166,7 +203,7 @@ def build_cnn(input_var=None):
 
     # Input layer, will be 3 dimension (since we have spectrograms as inputs),
     # while the second and third will be the total bytes of the image:
-    network = lasagne.layers.InputLayer(shape=(None, 3, 227, 227),
+    network = lasagne.layers.InputLayer(shape=(None, 4, 227, 227),
                                         input_var=input_var)
     # This time we do not apply input dropout, as it tends to work less well
     # for convolutional layers.
@@ -187,7 +224,7 @@ def build_cnn(input_var=None):
     # Another convolution with 32 5x5 kernels, and another 2x2 pooling:
     # we changed that to 3x3 (Thodoris)
     network = lasagne.layers.Conv2DLayer(
-            network, num_filters=32, filter_size=(5, 5),
+            network, num_filters=32, filter_size=(3, 3),
             nonlinearity=lasagne.nonlinearities.rectify)
     network = lasagne.layers.MaxPool2DLayer(network, pool_size=(2, 2))
 
@@ -359,6 +396,10 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 		
 		if model == 'cnn':
 			network = build_cnn(input_var)
+		elif model == 'cnn+rnn':
+			network = build_cnnrnn(input_var)
+		elif model == 'simple':
+			network = build_simple(input_var)
 
 		# Create a loss expression for training, i.e., a scalar objective we want
 		# to minimize (for our multi-class problem, it is the cross-entropy loss):
@@ -372,7 +413,7 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 		# Descent (SGD) with Nesterov momentum, but Lasagne offers plenty more.
 		params = lasagne.layers.get_all_params(network, trainable=True)
 		updates = lasagne.updates.nesterov_momentum(
-				loss, params, learning_rate=0.002, momentum=0.5)
+				loss, params, learning_rate=0.02, momentum=0.5)
 
 		# Create a loss expression for validation/testing. The crucial difference
 		# here is that we do a deterministic forward pass through the network,
