@@ -70,29 +70,29 @@ until $DONE; do
 
 		cd $prefixPositiveClass
 		for f in *.wav; do
-			f1=${f%.wav}
-			png1=$path2/$f1$suffix1;
-			png2=$path2/$f1$suffix2;
-			png3=$path2/$f1$suffix3;
-			png4=$path2/$f1$suffix4;
-			png5=$path2/$f1$suffix5;
-			png6=$path2/$f1$suffix6;
-			png7=$path2/$f1$suffix7;
-			png8=$path2/$f1$suffix8;
-			png9=$path2/$f1$suffix9;
-			png10=$path2/$f1$suffix10;
+			#f1=${f%.wav}
+			png1=$path2/$f$suffix1;
+			png2=$path2/$f$suffix2;
+			png3=$path2/$f$suffix3;
+			png4=$path2/$f$suffix4;
+			png5=$path2/$f$suffix5;
+			png6=$path2/$f$suffix6;
+			png7=$path2/$f$suffix7;
+			png8=$path2/$f$suffix8;
+			png9=$path2/$f$suffix9;
+			png10=$path2/$f$suffix10;
 			#echo $png1
 			#echo $f$suffix1
-			#cp $png1 $dataset/$REPLY/$REPLY/$f$suffix1
-			#cp $png2 $dataset/$REPLY/$REPLY/$f$suffix2
-			#cp $png3 $dataset/$REPLY/$REPLY/$f$suffix3
-			#cp $png4 $dataset/$REPLY/$REPLY/$f$suffix4
-			#cp $png5 $dataset/$REPLY/$REPLY/$f$suffix5
-			#cp $png6 $dataset/$REPLY/$REPLY/$f$suffix6
-			#cp $png7 $dataset/$REPLY/$REPLY/$f$suffix7
-			#cp $png8 $dataset/$REPLY/$REPLY/$f$suffix8
-			#cp $png9 $dataset/$REPLY/$REPLY/$f$suffix9
-			#cp $png10 $dataset/$REPLY/$REPLY/$f$suffix10
+			cp $png1 $dataset/$REPLY/$REPLY/$f$suffix1
+			cp $png2 $dataset/$REPLY/$REPLY/$f$suffix2
+			cp $png3 $dataset/$REPLY/$REPLY/$f$suffix3
+			cp $png4 $dataset/$REPLY/$REPLY/$f$suffix4
+			cp $png5 $dataset/$REPLY/$REPLY/$f$suffix5
+			cp $png6 $dataset/$REPLY/$REPLY/$f$suffix6
+			cp $png7 $dataset/$REPLY/$REPLY/$f$suffix7
+			cp $png8 $dataset/$REPLY/$REPLY/$f$suffix8
+			cp $png9 $dataset/$REPLY/$REPLY/$f$suffix9
+			cp $png10 $dataset/$REPLY/$REPLY/$f$suffix10
 		done
 
 		prefixNegativeClass=$path2$REPLY/$literalNegativeClass$REPLY
@@ -103,29 +103,29 @@ until $DONE; do
 		
 		cd $path1/$REPLY/$literalNegativeClass$REPLY
 		for f in *.wav; do
-			f1=${f%.wav}
-			png1=$path2/$f1$suffix1;
-			png2=$path2/$f1$suffix2;
-			png3=$path2/$f1$suffix3;
-			png4=$path2/$f1$suffix4;
-			png5=$path2/$f1$suffix5;
-			png6=$path2/$f1$suffix6;
-			png7=$path2/$f1$suffix7;
-			png8=$path2/$f1$suffix8;
-			png9=$path2/$f1$suffix9;
-			png10=$path2/$f1$suffix10;
-			echo $png1
-			echo $f$suffix1
-			#cp $png1 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix1
-			#cp $png2 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix2
-			#cp $png3 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix3
-			#cp $png4 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix4
-			#cp $png5 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix5
-			#cp $png6 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix6
-			#cp $png7 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix7
-			#cp $png8 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix8
-			#cp $png9 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix9
-			#cp $png10 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix10
+			#f1=${f%.wav}
+			png1=$path2/$f$suffix1;
+			png2=$path2/$f$suffix2;
+			png3=$path2/$f$suffix3;
+			png4=$path2/$f$suffix4;
+			png5=$path2/$f$suffix5;
+			png6=$path2/$f$suffix6;
+			png7=$path2/$f$suffix7;
+			png8=$path2/$f$suffix8;
+			png9=$path2/$f$suffix9;
+			png10=$path2/$f$suffix10;
+			#echo $png1
+			#echo $f$suffix1
+			cp $png1 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix1
+			cp $png2 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix2
+			cp $png3 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix3
+			cp $png4 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix4
+			cp $png5 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix5
+			cp $png6 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix6
+			cp $png7 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix7
+			cp $png8 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix8
+			cp $png9 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix9
+			cp $png10 $dataset/$REPLY/$literalNegativeClass$REPLY/$f$suffix10
 		done
 	fi
 done

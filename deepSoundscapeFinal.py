@@ -16,10 +16,13 @@ import Image
 import ImageOps
 from pandas import DataFrame
 
+import csv
+
 
 import lasagne
 
 from sklearn import cross_validation
+from sklearn import metrics
 
 PIXELS = 227
 
@@ -46,6 +49,7 @@ def defineClassToPathDict(classesPositive):
 	for i in classToPathDict:
 		classToPathDict[i] = initialPath + '/' + i
 	
+	print(classToPathDict)
 	return classToPathDict
 
 # ############################ mapInstancesToMultipleLabels #######################
@@ -55,18 +59,18 @@ def defineClassToPathDict(classesPositive):
 
 def mapInstancesToMultipleLabels(classToPathDict):
 	
-	pathToWavs = '/home/nikos/Desktop/NCSRDemokritos/CNNs-Soundscape-Quality-Estimation/Documents/soundscapeanalysis/wav2'
+	pathToWavs = '/home/nikos/Desktop/NCSRDemokritos/CNNs-Soundscape-Quality-Estimation/data/SoundscapeWAVs'
 	#jpgInstances = [i+'.jpg' for i in os.listdir(pathToWavs)]
-	pngInstances = [i+'.png' for i in os.listdir(pathToWavs)]
-	png_rnoise21Instances = [i+'_rnoise21.png' for i in os.listdir(pathToWavs)]
-	png_rnoise22Instances = [i+'_rnoise22.png' for i in os.listdir(pathToWavs)]
-	png_rnoise23Instances = [i+'_rnoise23.png' for i in os.listdir(pathToWavs)]
-	png_rnoise11Instances = [i+'_rnoise11.png' for i in os.listdir(pathToWavs)]
-	png_rnoise12Instances = [i+'_rnoise12.png' for i in os.listdir(pathToWavs)]
-	png_rnoise13Instances = [i+'_rnoise13.png' for i in os.listdir(pathToWavs)]
-	png_rnoise01Instances = [i+'_rnoise01.png' for i in os.listdir(pathToWavs)]
-	png_rnoise02Instances = [i+'_rnoise02.png' for i in os.listdir(pathToWavs)]
-	png_rnoise03Instances = [i+'_rnoise03.png' for i in os.listdir(pathToWavs)]
+	pngInstances = [i[:-4]+'.png' for i in os.listdir(pathToWavs)]
+	png_rnoise21Instances = [i[:-4]+'_rnoise21.png' for i in os.listdir(pathToWavs)]
+	png_rnoise22Instances = [i[:-4]+'_rnoise22.png' for i in os.listdir(pathToWavs)]
+	png_rnoise23Instances = [i[:-4]+'_rnoise23.png' for i in os.listdir(pathToWavs)]
+	png_rnoise11Instances = [i[:-4]+'_rnoise11.png' for i in os.listdir(pathToWavs)]
+	png_rnoise12Instances = [i[:-4]+'_rnoise12.png' for i in os.listdir(pathToWavs)]
+	png_rnoise13Instances = [i[:-4]+'_rnoise13.png' for i in os.listdir(pathToWavs)]
+	png_rnoise01Instances = [i[:-4]+'_rnoise01.png' for i in os.listdir(pathToWavs)]
+	png_rnoise02Instances = [i[:-4]+'_rnoise02.png' for i in os.listdir(pathToWavs)]
+	png_rnoise03Instances = [i[:-4]+'_rnoise03.png' for i in os.listdir(pathToWavs)]
 	#jpg_02AInstances = [i+'_02A.jpg' for i in os.listdir(pathToWavs)]
 	#jpg_02BInstances = [i+'_02B.jpg' for i in os.listdir(pathToWavs)]
 	jpgInstances = pngInstances + png_rnoise21Instances + png_rnoise21Instances + png_rnoise22Instances + png_rnoise23Instances + png_rnoise11Instances + png_rnoise12Instances + png_rnoise13Instances + png_rnoise01Instances + png_rnoise02Instances + png_rnoise03Instances
@@ -74,6 +78,7 @@ def mapInstancesToMultipleLabels(classToPathDict):
 
 	instancesPerClass = []
 	classNames = []
+	print(classToPathDict)
 	for i in classToPathDict:
 		classNames.append(i)
 		instancesPerClass.append(os.listdir(classToPathDict[i]))
@@ -101,6 +106,8 @@ def load_dataset(className, classToPathDict, instancesToMultipleLabelsMap, r_trn
 		
 	negativeClassString = 'not_'
 	
+	#print(instancesToMultipleLabelsMap)
+	
 	positiveClass = className + '/' + className
 	negativeClass = className + '/' + negativeClassString + className
 	
@@ -108,7 +115,7 @@ def load_dataset(className, classToPathDict, instancesToMultipleLabelsMap, r_trn
 	X_P = []
 	labels = []
 	instanceNames = []
-		
+	
 	for i in instancesToMultipleLabelsMap:
 		if not instancesToMultipleLabelsMap[i]:
 			continue
@@ -170,15 +177,17 @@ def load_dataset(className, classToPathDict, instancesToMultipleLabelsMap, r_trn
 	return inputs[trn], labels[trn], inputs[vld], labels[vld], inputs[tst], labels[tst], instanceNames[trn], instanceNames[vld], instanceNames[tst]
 	
 def build_simple(input_var=None):
-	network = lasagne.layers.InputLayer(shape=(None, 3, 227, 227), input_var=input_var)
+	network = lasagne.layers.InputLayer(shape=(None, 4, 227, 227), input_var=input_var)
 	
 	network = lasagne.layers.DenseLayer(lasagne.layers.dropout(network, p=.5), num_units=100, nonlinearity=lasagne.nonlinearities.rectify)
 	
 	network = lasagne.layers.DenseLayer(lasagne.layers.dropout(network, p=.5), num_units=1,nonlinearity=lasagne.nonlinearities.sigmoid)
+	
+	return network
 
 def build_cnnrnn(input_var=None):
 	
-    network = lasagne.layers.InputLayer(shape=(None, 3, 227, 227), input_var=input_var)
+    network = lasagne.layers.InputLayer(shape=(None, 4, 227, 227), input_var=input_var)
                                         
     network = lasagne.layers.Conv2DLayer(network, num_filters=96, filter_size=(7,7), pad=0, flip_filters=False,stride=2,nonlinearity=lasagne.nonlinearities.rectify)
     network = lasagne.layers.Pool2DLayer(network, pool_size = (3,3), stride = 2, mode = 'max')
@@ -266,7 +275,7 @@ def iterate_minibatches(inputs, targets, instanceNames, batchsize, shuffle=False
             excerpt = slice(start_idx, start_idx + batchsize)
         yield inputs[excerpt], targets[excerpt], instanceNames[excerpt]
         
-def compute_recall_precision(labels, preds):
+def compute_recall_precision(labels, preds, threshold = 0.5):
 	
 	TruePositives = 0
 	TrueNegatives = 0
@@ -274,13 +283,13 @@ def compute_recall_precision(labels, preds):
 	FalsePositives = 0
 	
 	for label, pred in zip(labels, preds):
-		if int(pred) == 1 and label[0] == 1:
+		if pred >= threshold and label[0] == 1:
 			TruePositives += 1
-		elif int(pred) == 0 and label[0] == 0:
+		elif pred < threshold and label[0] == 0:
 			TrueNegatives += 1
-		elif int(pred) == 0 and label[0] == 1:
+		elif pred < threshold and label[0] == 1:
 			FalseNegatives += 1
-		elif int(pred) == 1 and label[0] == 0:
+		elif pred >= threshold and label[0] == 0:
 			FalsePositives += 1
 	
 	if(TruePositives == 0 and FalsePositives == 0):
@@ -293,7 +302,7 @@ def compute_recall_precision(labels, preds):
 		precision = TruePositives / (TruePositives + FalseNegatives)
 	return recall, precision
 	
-def multilabel_fn_gather_results(preds, instanceNames, instancesToMultipleLabelsMap, multiLabelClassificationResults, c):
+def multilabel_fn_gather_results(preds, instanceNames, instancesToMultipleLabelsMap, multiLabelClassificationResults, c, threshold = 0.5):
 	
 	negativeClass = c + '/' + 'not_' + c
 	positiveClass = c + '/' + c
@@ -305,66 +314,96 @@ def multilabel_fn_gather_results(preds, instanceNames, instancesToMultipleLabels
 	TrueNegatives = 0
 	FalsePositives = 0
 	FalseNegatives = 0
-	
+	#print(multiLabelClassificationResults)
 	if multiLabelClassificationResults == {}:
 		multiLabelClassificationResults= {}.fromkeys(instanceNamesTemp)
 		
 		for instance, pred  in zip(instanceNamesTemp, preds):
-			if positiveClass in instancesToMultipleLabelsMap[instance] and int(pred) == 1:
+			if positiveClass in instancesToMultipleLabelsMap[instance] and pred >= threshold:
 				multiLabelClassificationResults[instance] = [[1, 1]]
-			elif positiveClass in instancesToMultipleLabelsMap[instance] and int(pred) == 0:
+				TruePositives = TruePositives + 1
+			elif positiveClass in instancesToMultipleLabelsMap[instance] and pred < threshold:
 				multiLabelClassificationResults[instance] = [[1, 0]]
-			elif negativeClass in instancesToMultipleLabelsMap[instance] and int(pred) == 0:
+				FalseNegatives = FalseNegatives + 1
+			elif negativeClass in instancesToMultipleLabelsMap[instance] and pred < threshold:
 				multiLabelClassificationResults[instance] = [[0, 0]]
-			elif negativeClass in instancesToMultipleLabelsMap[instance] and int(pred) == 1:
+				TrueNegatives = TrueNegatives + 1
+			elif negativeClass in instancesToMultipleLabelsMap[instance] and pred >= threshold:
 				multiLabelClassificationResults[instance] = [[0, 1]]
+				FalsePositives = FalsePositives + 1
+		return multiLabelClassificationResults
 	else:
-		for instance, pred in zip(instanceNamesTemp, pred):
-			if positiveClass in instancesToMultipleLabelsMap[instance] and int(pred) == 1:
-				multiLabelClassificationResults[instance].append([1, 1])
-			elif positiveClass in instancesToMultipleLabelsMap[instance] and int(pred) == 0:
-				multiLabelClassificationResults[instance].append([1, 0])
-			elif negativeClass in instancesToMultipleLabelsMap[instance] and int(pred) == 0:
-				multiLabelClassificationResults[instance].append([0, 0])
-			elif negativeClass in instancesToMultipleLabelsMap[instance] and int(pred) == 1:
-				multiLabelClassificationResults[instance].append([0, 1])
-				
-	return multiLabelClassificationResults
+		temp_multiLabelClassificationResults = {}.fromkeys(instanceNamesTemp)
+		new_multiLabelClassificationResults = multiLabelClassificationResults.copy()
+		new_multiLabelClassificationResults.update(temp_multiLabelClassificationResults) 
+		for instance, pred in zip(instanceNamesTemp, preds):
+			if positiveClass in instancesToMultipleLabelsMap[instance] and pred >= threshold:
+				if not new_multiLabelClassificationResults[instance]:
+					new_multiLabelClassificationResults[instance] = [[1, 1]]
+				else:
+					new_multiLabelClassificationResults[instance].append([1, 1])
+			elif positiveClass in instancesToMultipleLabelsMap[instance] and pred < threshold:
+				if not new_multiLabelClassificationResults[instance]:
+					new_multiLabelClassificationResults[instance] = [[1, 0]]
+				else:
+					new_multiLabelClassificationResults[instance].append([1, 0])
+			elif negativeClass in instancesToMultipleLabelsMap[instance] and pred < threshold:
+				if not new_multiLabelClassificationResults[instance]:
+					new_multiLabelClassificationResults[instance] = [[0, 0]]
+				else:
+					new_multiLabelClassificationResults[instance].append([0, 0])
+			elif negativeClass in instancesToMultipleLabelsMap[instance] and pred >= threshold:
+				if not new_multiLabelClassificationResults[instance]:
+					new_multiLabelClassificationResults[instance] = [[0, 1]]
+				else:
+					new_multiLabelClassificationResults[instance].append([0, 1])
+					
+		return new_multiLabelClassificationResults
 
 def multilabel_fn_compute_metrics(multiLabelClassificationResults):
 	
 	rec = 0
 	pres = 0
 	count = 0
+	Truth = 0
+	Prediction = 0
+	TruthAndPrediction = 0
+	
 	
 	for instance in multiLabelClassificationResults:
-		Truth = 0
-		Prediction = 0
-		TruthAndPrediction = 0
+
 		for TruthPredictionPair in multiLabelClassificationResults[instance]:
+			#print(TruthPredictionPair)
 			if TruthPredictionPair[0] == 1:
+				#print("truth")
 				Truth += 1
 			if TruthPredictionPair[1] == 1:
 				Prediction += 1
-			if TruthPredictionPair[0] == TruthPredictionPair[1]:
+				#print("prediction")
+			if TruthPredictionPair[0] == 1 and TruthPredictionPair[1] == 1:
 				TruthAndPrediction += 1
-		
+				#print("both")
 		if(Truth == 0):
-			rec += 0
+			rec += 0.0
 		else:
 			rec += TruthAndPrediction / Truth
+			#print(rec)
 			
 		if(Prediction == 0):
-			pres += 0
+			pres += 0.0
 		else:
-			pres += TruthAndPredition / Prediction
+			pres += TruthAndPrediction / Prediction
+			#print(pres)
 		
 		count += 1
-	
+
+	#pres = TruthAndPrediction / Prediction / count
+	#rec = TruthAndPrediction / Truth / count
 	pres = pres / count
 	rec = rec / count
+	f_score = 2.0 * pres * rec / (pres+rec)
 	
-	return pres, rec
+	return pres, rec, f_score
 	
 # ############################## Main program ################################
 # Everything else will be handled in our main program now. We could pull out
@@ -412,8 +451,11 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 		# parameters at each training step. Here, we'll use Stochastic Gradient
 		# Descent (SGD) with Nesterov momentum, but Lasagne offers plenty more.
 		params = lasagne.layers.get_all_params(network, trainable=True)
-		updates = lasagne.updates.nesterov_momentum(
-				loss, params, learning_rate=0.02, momentum=0.5)
+		#updates = lasagne.updates.nesterov_momentum(
+		#		loss, params, learning_rate=0.0001, momentum=0.5)
+		
+		updates = lasagne.updates.sgd(loss, params, learning_rate = 0.02)
+		#updates = lasagne.updates.adam(loss, params)
 
 		# Create a loss expression for validation/testing. The crucial difference
 		# here is that we do a deterministic forward pass through the network,
@@ -435,13 +477,18 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 		
 		# Finally, launch the training loop.
 		print("Starting training...")
+		
+		# We define a threshold
+		threshold = 0.4
+		
 		# We iterate over epochs:
 		for epoch in range(num_epochs):
 			# In each epoch, we do a full pass over the training data:
 			train_err = 0
 			train_batches = 0
 			start_time = time.time()
-			for batch in iterate_minibatches(X_train, y_train, instanceNames_train, 10, shuffle=True):
+			#print(y_train)
+			for batch in iterate_minibatches(X_train, y_train, instanceNames_train, 32, shuffle=True):
 				inputs, targets, instanceNamesTemp = batch
 				train_err += train_fn(inputs, targets)
 				train_batches += 1
@@ -455,7 +502,7 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 			preds = []
 			true = 0
 			count = 0
-			for batch in iterate_minibatches(X_val, y_val, instanceNames_val, 1, shuffle=False):
+			for batch in iterate_minibatches(X_val, y_val, instanceNames_val, 1, shuffle=True):
 				
 				inputs, targets, instanceNamesTemp = batch
 				err, acc, temp_preds = val_fn(inputs, targets)
@@ -464,29 +511,68 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 				
 				#print(temp_preds)
 				#print(targets)
-				if(temp_preds > 0.5 and targets == 1):
+				if(temp_preds >= threshold and targets == 1):
 					true += 1
-				elif(temp_preds < 0.5 and targets == 0):
+				elif(temp_preds < threshold and targets == 0):
 					true += 1
 				count += 1
 				preds.append(temp_preds[0][0].tolist())
 
 				val_batches += 1
 
-			val_recall, val_precision = compute_recall_precision(y_val, preds)
-			print("printing the alternative accuracy")
-			print(true/count)
+			val_recall, val_precision = compute_recall_precision(y_val, preds, threshold)
+							
+			if epoch == num_epochs-1:
+				dataCSV_0 = open('predLabelsNotVehicles-Validation.csv', 'wb')
+				dataCSV_1 = open('predLabelsVehicles-Validation.csv', 'wb')
+				writer_0 = csv.writer(dataCSV_0, delimiter=',')
+				writer_1 = csv.writer(dataCSV_1, delimiter=',')
+				writer_0.writerow(['Predicted Label'])
+				writer_1.writerow(['Predicted Label'])
+				for label, pred_label in zip(y_val, preds):
+					if label[0] == 0:
+						data = [pred_label]
+						writer_0.writerow(data)		
+					else:
+						data = [pred_label]
+						writer_1.writerow(data)	
+			"""else:
+				dataCSV = open('test.csv', 'a')
+				writer = csv.writer(dataCSV, delimiter=',')
+				for label, pred_label in zip(y_val, preds):
+					data = [epoch, y_val, preds]
+					writer.writerow(data)"""
+			
+			if(val_precision + val_recall == 0):
+				val_f_score = float('nan')
+			else:
+				val_f_score = 2.0*val_precision*val_recall/ float(val_precision+val_recall)
+			
+			if epoch == 0:
+				dataCSVAcc = open('ValidationMetrics.csv', 'wb')
+				writer_Acc = csv.writer(dataCSVAcc, delimiter=',')
+				writer_Acc.writerow(['Epoch', 'Accuracy', 'Recall', 'Precision', 'F-score'])
+				writer_Acc.writerow([epoch, true/count, val_recall, val_precision, val_f_score])
+			else:
+				dataCSVAcc = open('ValidationMetrics.csv', 'a')
+				writer_Acc.writerow([epoch, true/count, val_recall, val_precision, val_f_score])
+			
+			#val_recall = metrics.precision_score(y_val, preds)
+			#val_precision = metrics.recall_score(y_val, preds)
+				
 			# Then we print the results for this epoch:
 			print("Epoch {} of {} took {:.3f}s".format(
 				epoch + 1, num_epochs, time.time() - start_time))
 			print("   Binary Classification : training loss:\t\t{:.6f}".format(train_err / train_batches))
 			print("   Binary Classification : validation loss:\t\t{:.6f}".format(val_err / val_batches))
 			print("   Binary Classification : validation accuracy:\t\t{:.2f} %".format(
-				val_acc / val_batches * 100))
+				true/count * 100))
 			print("   Binary Classification : validation recall:\t\t{:.2f} %".format(
 				val_recall * 100))
 			print("   Binary Classification : validation precision:\t{:.2f} %".format(
 				val_precision * 100))
+			print("   Binary Classification : validation f_score:\t{:.2f} %".format(
+				val_f_score * 100))
 
 		# After training, we compute and print the test metrics:
 		tst_err = 0
@@ -494,8 +580,10 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 		tst_rec = 0
 		tst_pres = 0
 		tst_batches = 0
+		count = 0
+		true = 0
 		preds = []
-		for batch in iterate_minibatches(X_tst, y_tst, instanceNames_tst, 1, shuffle=False):
+		for batch in iterate_minibatches(X_tst, y_tst, instanceNames_tst, 1, shuffle=True):
 			
 			inputs, targets, instanceNamesTemp = batch
 			err, acc, temp_preds = val_fn(inputs, targets)
@@ -504,23 +592,55 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 			#print(temp_preds)
 			#print(targets)
 			
+			if(temp_preds >= threshold and targets == 1):
+				true += 1
+			elif(temp_preds < threshold and targets == 0):
+				true += 1
+			count += 1
+			
 			preds.append(temp_preds[0][0].tolist())
 			
 			tst_batches += 1
 		
-		tst_recall, tst_precision = compute_recall_precision(y_tst, preds)
-		#val_fn_more_metrics(preds, instanceNames_tst, instancesToMultipleLabelsMap, c)
+		tst_recall, tst_precision = compute_recall_precision(y_tst, preds, threshold)	
 		
-		multiLabelClassificationResults = multilabel_fn_gather_results(preds, instanceNames_tst, instancesToMultipleLabelsMap, multiLabelClassificationResults, c)
+		if(tst_precision + tst_recall == 0):
+			tst_f_score = float('nan')
+		else:
+			tst_f_score = 2.0*tst_precision*tst_recall/ float(tst_precision+tst_recall)
+			
+		multiLabelClassificationResults = multilabel_fn_gather_results(preds, instanceNames_tst, instancesToMultipleLabelsMap, multiLabelClassificationResults, c, threshold)
+		
+		dataCSV_0 = open('predLabelsNotVehicles-Test.csv', 'wb')
+		dataCSV_1 = open('predLabelsVehicles-Test.csv', 'wb')
+		writer_0 = csv.writer(dataCSV_0, delimiter=',')
+		writer_1 = csv.writer(dataCSV_1, delimiter=',')
+		writer_0.writerow(['Predicted Label'])
+		writer_1.writerow(['Predicted Label'])
+		
+		for label, pred_label in zip(y_tst, preds):
+			if label[0] == 0:
+				data = [pred_label]
+				writer_0.writerow(data)		
+			else:
+				data = [pred_label]
+				writer_1.writerow(data)		
+		
+		dataCSVAcc = open('TestMetrics.csv', 'wb')
+		writer_Acc = csv.writer(dataCSVAcc, delimiter=',')
+		writer_Acc.writerow(['Accuracy', 'Recall', 'Precision', 'F-score'])
+		writer_Acc.writerow([true/count, tst_recall, tst_precision, tst_f_score])
 		
 		print("Final results:")
 		print("   Binary Classification : test loss:\t\t\t{:.6f}".format(tst_err / tst_batches))
 		print("   Binary Classification : test accuracy:\t\t{:.2f} %".format(
-			tst_acc / tst_batches * 100))
+			true/count * 100))
 		print("   Binary Classification : test recall:\t\t{:.2f} %".format(
-				tst_recall * 100))
+			tst_recall * 100))
 		print("   Binary Classification : test precision:\t\t{:.2f} %".format(
 			tst_precision * 100))
+		print("   Binary Classification : test f_score:\t{:.2f} %".format(
+				tst_f_score * 100))
 			
 		# Optionally, you could now dump the network weights to a file like this:
 		# np.savez('model.npz', *lasagne.layers.get_all_param_values(network))
@@ -530,12 +650,12 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 		#     param_values = [f['arr_%d' % i] for i in range(len(f.files))]
 		# lasagne.layers.set_all_param_values(network, param_values)
 			
-    multi_rec, multi_pres = multilabel_fn_compute_metrics(multiLabelClassificationResults)
+    multi_rec, multi_pres, multi_f_score = multilabel_fn_compute_metrics(multiLabelClassificationResults)
     print("   Multilabel Classification : test recall:\t\t{:.2f} %".format(multi_rec * 100))
     print("   Multilabel Classification : test precision:\t\t{:.2f} %".format(multi_pres * 100))
+    print("   Multilabel Classification : test f_score:\t\t{:.2f} %".format(multi_f_score * 100))
 	
-	
-    
+	  
 if __name__ == '__main__':
     if ('--help' in sys.argv) or ('-h' in sys.argv):
         print("Trains a neural network on MNIST using Lasagne.")
