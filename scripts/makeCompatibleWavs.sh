@@ -17,7 +17,7 @@ for f in *.wav; do avconv -i $f $prefix/tmpwav/$f -y; done;
 #nikos' line
 for f in *.wav; do avconv -i $f -ar 16000 -ac 1 $prefix/tmpwav/$f -y; done;
 cd .. 
-#rm -r $prefix
+#-rm -r $prefix
 #mv ./tmpwav $prefix
 #!/bin/bash
 

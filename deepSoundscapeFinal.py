@@ -39,7 +39,7 @@ def defineClassToPathDict(classesPositive):
 		if classesPositive[i] == 'voice_children':
 			classesPositive[i] = 'voice_(children)'
 	
-	initialPath = '/home/nikos/Desktop/NCSRDemokritos/CNNs-Soundscape-Quality-Estimation/data/complete_dataset'
+	initialPath = '/home/nikos/Desktop/NCSRDemokritos/CNNs-Soundscape-Quality-Estimation/data/complete_dataset2'
 	negativeClassString = 'not_'
 	classesPositiveNegative = []
 	for i in classesPositive:
@@ -65,15 +65,24 @@ def mapInstancesToMultipleLabels(classToPathDict):
 	png_rnoise21Instances = [i[:-4]+'_rnoise21.png' for i in os.listdir(pathToWavs)]
 	png_rnoise22Instances = [i[:-4]+'_rnoise22.png' for i in os.listdir(pathToWavs)]
 	png_rnoise23Instances = [i[:-4]+'_rnoise23.png' for i in os.listdir(pathToWavs)]
+	png_rnoise24Instances = [i[:-4]+'_rnoise24.png' for i in os.listdir(pathToWavs)]
+	png_rnoise25Instances = [i[:-4]+'_rnoise25.png' for i in os.listdir(pathToWavs)]
+	png_rnoise26Instances = [i[:-4]+'_rnoise26.png' for i in os.listdir(pathToWavs)]
 	png_rnoise11Instances = [i[:-4]+'_rnoise11.png' for i in os.listdir(pathToWavs)]
 	png_rnoise12Instances = [i[:-4]+'_rnoise12.png' for i in os.listdir(pathToWavs)]
 	png_rnoise13Instances = [i[:-4]+'_rnoise13.png' for i in os.listdir(pathToWavs)]
+	png_rnoise14Instances = [i[:-4]+'_rnoise14.png' for i in os.listdir(pathToWavs)]
+	png_rnoise15Instances = [i[:-4]+'_rnoise15.png' for i in os.listdir(pathToWavs)]
+	png_rnoise16Instances = [i[:-4]+'_rnoise16.png' for i in os.listdir(pathToWavs)]
 	png_rnoise01Instances = [i[:-4]+'_rnoise01.png' for i in os.listdir(pathToWavs)]
 	png_rnoise02Instances = [i[:-4]+'_rnoise02.png' for i in os.listdir(pathToWavs)]
 	png_rnoise03Instances = [i[:-4]+'_rnoise03.png' for i in os.listdir(pathToWavs)]
+	png_rnoise04Instances = [i[:-4]+'_rnoise04.png' for i in os.listdir(pathToWavs)]
+	png_rnoise05Instances = [i[:-4]+'_rnoise05.png' for i in os.listdir(pathToWavs)]
+	png_rnoise06Instances = [i[:-4]+'_rnoise06.png' for i in os.listdir(pathToWavs)]
 	#jpg_02AInstances = [i+'_02A.jpg' for i in os.listdir(pathToWavs)]
 	#jpg_02BInstances = [i+'_02B.jpg' for i in os.listdir(pathToWavs)]
-	jpgInstances = pngInstances + png_rnoise21Instances + png_rnoise21Instances + png_rnoise22Instances + png_rnoise23Instances + png_rnoise11Instances + png_rnoise12Instances + png_rnoise13Instances + png_rnoise01Instances + png_rnoise02Instances + png_rnoise03Instances
+	jpgInstances = pngInstances + png_rnoise21Instances + png_rnoise21Instances + png_rnoise22Instances + png_rnoise23Instances + png_rnoise24Instances + png_rnoise25Instances + png_rnoise26Instances + png_rnoise11Instances + png_rnoise12Instances + png_rnoise13Instances + png_rnoise14Instances + png_rnoise15Instances + png_rnoise16Instances + png_rnoise01Instances + png_rnoise02Instances + png_rnoise03Instances + png_rnoise04Instances + png_rnoise05Instances + png_rnoise06Instances
 	instancesToMultipleLabelsMap = {}.fromkeys(jpgInstances)
 
 	instancesPerClass = []
@@ -97,7 +106,7 @@ def mapInstancesToMultipleLabels(classToPathDict):
 # This function simply organizes the dataset for each binary classification
 # problem. It returns the training, validation and testing set each time
 
-def load_dataset(className, classToPathDict, instancesToMultipleLabelsMap, r_trn = 0.8, r_vld = 0.1, r_tst = 0.1, seed = 123):
+def load_dataset(className, classToPathDict, instancesToMultipleLabelsMap, r_trn = 0.7, r_vld = 0.2, r_tst = 0.1, seed = 123):
 	
 	if className == 'voice_adults':
 		className = 'voice_(adults)'
@@ -177,13 +186,22 @@ def load_dataset(className, classToPathDict, instancesToMultipleLabelsMap, r_trn
 	return inputs[trn], labels[trn], inputs[vld], labels[vld], inputs[tst], labels[tst], instanceNames[trn], instanceNames[vld], instanceNames[tst]
 	
 def build_simple(input_var=None):
-	network = lasagne.layers.InputLayer(shape=(None, 4, 227, 227), input_var=input_var)
+    network = lasagne.layers.InputLayer(shape=(None, 4, 227, 227), input_var=input_var)
+    network = lasagne.layers.Conv2DLayer(network, num_filters=32, filter_size=(3, 3), nonlinearity=lasagne.nonlinearities.rectify)
+    network = lasagne.layers.MaxPool2DLayer(network, pool_size=(2, 2))
+    network = lasagne.layers.DropoutLayer(network, p = 0.1)
+    network = lasagne.layers.Conv2DLayer(network, num_filters=64, filter_size=(2, 2), nonlinearity=lasagne.nonlinearities.rectify)
+    network = lasagne.layers.MaxPool2DLayer(network, pool_size=(2, 2))
+    network = lasagne.layers.DropoutLayer(network, p = 0.2)
+    network = lasagne.layers.Conv2DLayer(network, num_filters=128, filter_size=(2, 2), nonlinearity=lasagne.nonlinearities.rectify)
+    network = lasagne.layers.MaxPool2DLayer(network, pool_size=(2, 2))
+    network = lasagne.layers.DropoutLayer(network, p = 0.3)
+    network = lasagne.layers.DenseLayer(lasagne.layers.dropout(network, p=.5), num_units=500, nonlinearity=lasagne.nonlinearities.rectify)
+    network = lasagne.layers.DenseLayer(lasagne.layers.dropout(network, p=.0), num_units=100, nonlinearity=lasagne.nonlinearities.rectify)
+    network = lasagne.layers.DenseLayer(lasagne.layers.dropout(network, p=.0), num_units=1, nonlinearity=lasagne.nonlinearities.sigmoid)
+    
 	
-	network = lasagne.layers.DenseLayer(lasagne.layers.dropout(network, p=.5), num_units=100, nonlinearity=lasagne.nonlinearities.rectify)
-	
-	network = lasagne.layers.DenseLayer(lasagne.layers.dropout(network, p=.5), num_units=1,nonlinearity=lasagne.nonlinearities.sigmoid)
-	
-	return network
+    return network
 
 def build_cnnrnn(input_var=None):
 	
@@ -220,9 +238,8 @@ def build_cnn(input_var=None):
     # Convolutional layer with 32 kernels of size 5x5. Strided and padded
     # convolutions are supported as well; see the docstring.
     network = lasagne.layers.Conv2DLayer(
-            network, num_filters=32, filter_size=(5, 5),
-            nonlinearity=lasagne.nonlinearities.rectify,
-            W=lasagne.init.GlorotUniform())
+            network, num_filters=6, filter_size=(5, 5),
+            nonlinearity=lasagne.nonlinearities.rectify)
     # Expert note: Lasagne provides alternative convolutional layers that
     # override Theano's choice of which implementation to use; for details
     # please see http://lasagne.readthedocs.org/en/latest/user/tutorial.html.
@@ -233,14 +250,14 @@ def build_cnn(input_var=None):
     # Another convolution with 32 5x5 kernels, and another 2x2 pooling:
     # we changed that to 3x3 (Thodoris)
     network = lasagne.layers.Conv2DLayer(
-            network, num_filters=32, filter_size=(3, 3),
+            network, num_filters=10, filter_size=(5, 5),
             nonlinearity=lasagne.nonlinearities.rectify)
     network = lasagne.layers.MaxPool2DLayer(network, pool_size=(2, 2))
 
     # A fully-connected layer of 256 units with 50% dropout on its inputs:
     network = lasagne.layers.DenseLayer(
             lasagne.layers.dropout(network, p=.5),
-            num_units=256,
+            num_units=100,
             nonlinearity=lasagne.nonlinearities.rectify)
 
     # And, finally, the 1-unit output layer with 50% dropout on its inputs:
@@ -450,12 +467,24 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 		# Create update expressions for training, i.e., how to modify the
 		# parameters at each training step. Here, we'll use Stochastic Gradient
 		# Descent (SGD) with Nesterov momentum, but Lasagne offers plenty more.
+		
+		lr = 0.1
+		weight_decay = 1e-5
+		
+		#weightsl1 = lasagne.regularization.regularize_network_params(network, lasagne.regularization.l1)
+		#weightsl2 = lasagne.regularization.regularize_network_params(network, lasagne.regularization.l2)
+		#loss += weight_decay * (weightsl2) #+ weightsl1*0.001)
+		
 		params = lasagne.layers.get_all_params(network, trainable=True)
 		#updates = lasagne.updates.nesterov_momentum(
 		#		loss, params, learning_rate=0.0001, momentum=0.5)
 		
-		updates = lasagne.updates.sgd(loss, params, learning_rate = 0.02)
-		#updates = lasagne.updates.adam(loss, params)
+		# Uncomment this for learning rate decay
+		#learning_rate = T.scalar(name = 'learning_rate')
+		#updates = lasagne.updates.sgd(loss, params, learning_rate)
+		
+		#updates = lasagne.updates.sgd(loss, params, learning_rate = 0.005)
+		updates = lasagne.updates.adam(loss, params)
 
 		# Create a loss expression for validation/testing. The crucial difference
 		# here is that we do a deterministic forward pass through the network,
@@ -470,6 +499,7 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 
 		# Compile a function performing a training step on a mini-batch (by giving
 		# the updates dictionary) and returning the corresponding training loss:
+		#train_fn = theano.function([input_var, target_var, learning_rate], loss, updates=updates)
 		train_fn = theano.function([input_var, target_var], loss, updates=updates)
 
 		# Compile a second function computing the validation loss and accuracy:
@@ -479,10 +509,21 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 		print("Starting training...")
 		
 		# We define a threshold
-		threshold = 0.4
+		if c == 'vehicles':
+			threshold = 0.5
+		else:
+			threshold = 0.25
+		
+		# We define a learning rate
+		#base_lr = 1e-4
+		#lr_decay = 0.8
 		
 		# We iterate over epochs:
 		for epoch in range(num_epochs):
+			
+			# We compute the learning rate for the epoch
+			#lr = base_lr * (lr_decay ** epoch)
+			
 			# In each epoch, we do a full pass over the training data:
 			train_err = 0
 			train_batches = 0
@@ -490,7 +531,7 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 			#print(y_train)
 			for batch in iterate_minibatches(X_train, y_train, instanceNames_train, 32, shuffle=True):
 				inputs, targets, instanceNamesTemp = batch
-				train_err += train_fn(inputs, targets)
+				train_err += train_fn(inputs, targets)#, lr)
 				train_batches += 1
 
 			# And a full pass over the validation data:
@@ -502,7 +543,7 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 			preds = []
 			true = 0
 			count = 0
-			for batch in iterate_minibatches(X_val, y_val, instanceNames_val, 1, shuffle=True):
+			for batch in iterate_minibatches(X_val, y_val, instanceNames_val, 1, shuffle=False):
 				
 				inputs, targets, instanceNamesTemp = batch
 				err, acc, temp_preds = val_fn(inputs, targets)
@@ -523,8 +564,8 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 			val_recall, val_precision = compute_recall_precision(y_val, preds, threshold)
 							
 			if epoch == num_epochs-1:
-				dataCSV_0 = open('predLabelsNotVehicles-Validation.csv', 'wb')
-				dataCSV_1 = open('predLabelsVehicles-Validation.csv', 'wb')
+				dataCSV_0 = open(c+'-Predicted Labels Negative Class.csv', 'wb')
+				dataCSV_1 = open(c+'-Predicted Labels Positive Class.csv', 'wb')
 				writer_0 = csv.writer(dataCSV_0, delimiter=',')
 				writer_1 = csv.writer(dataCSV_1, delimiter=',')
 				writer_0.writerow(['Predicted Label'])
@@ -549,12 +590,12 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 				val_f_score = 2.0*val_precision*val_recall/ float(val_precision+val_recall)
 			
 			if epoch == 0:
-				dataCSVAcc = open('ValidationMetrics.csv', 'wb')
+				dataCSVAcc = open(c+'-ValidationMetrics.csv', 'wb')
 				writer_Acc = csv.writer(dataCSVAcc, delimiter=',')
 				writer_Acc.writerow(['Epoch', 'Accuracy', 'Recall', 'Precision', 'F-score'])
 				writer_Acc.writerow([epoch, true/count, val_recall, val_precision, val_f_score])
 			else:
-				dataCSVAcc = open('ValidationMetrics.csv', 'a')
+				dataCSVAcc = open(c+'-ValidationMetrics.csv', 'a')
 				writer_Acc.writerow([epoch, true/count, val_recall, val_precision, val_f_score])
 			
 			#val_recall = metrics.precision_score(y_val, preds)
@@ -611,8 +652,8 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 			
 		multiLabelClassificationResults = multilabel_fn_gather_results(preds, instanceNames_tst, instancesToMultipleLabelsMap, multiLabelClassificationResults, c, threshold)
 		
-		dataCSV_0 = open('predLabelsNotVehicles-Test.csv', 'wb')
-		dataCSV_1 = open('predLabelsVehicles-Test.csv', 'wb')
+		dataCSV_0 = open(c+'-Predicted Labels Negative Class-Test.csv', 'wb')
+		dataCSV_1 = open(c+'-Predicted Labels Positive Class-Test.csv', 'wb')
 		writer_0 = csv.writer(dataCSV_0, delimiter=',')
 		writer_1 = csv.writer(dataCSV_1, delimiter=',')
 		writer_0.writerow(['Predicted Label'])
@@ -626,7 +667,7 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 				data = [pred_label]
 				writer_1.writerow(data)		
 		
-		dataCSVAcc = open('TestMetrics.csv', 'wb')
+		dataCSVAcc = open(c+'-TestMetrics.csv', 'wb')
 		writer_Acc = csv.writer(dataCSVAcc, delimiter=',')
 		writer_Acc.writerow(['Accuracy', 'Recall', 'Precision', 'F-score'])
 		writer_Acc.writerow([true/count, tst_recall, tst_precision, tst_f_score])
@@ -651,6 +692,11 @@ def main(model='cnn', num_epochs=500, classes = ['vehicles']):
 		# lasagne.layers.set_all_param_values(network, param_values)
 			
     multi_rec, multi_pres, multi_f_score = multilabel_fn_compute_metrics(multiLabelClassificationResults)
+    
+    dataCSVAcc = open('Multi-Label Test Metrics.csv', 'wb')
+    writer_Acc = csv.writer(dataCSVAcc, delimiter=',')
+    writer_Acc.writerow(['Recall', 'Precision', 'F-score'])
+    writer_Acc.writerow([multi_rec, multi_pres, multi_f_score])
     print("   Multilabel Classification : test recall:\t\t{:.2f} %".format(multi_rec * 100))
     print("   Multilabel Classification : test precision:\t\t{:.2f} %".format(multi_pres * 100))
     print("   Multilabel Classification : test f_score:\t\t{:.2f} %".format(multi_f_score * 100))

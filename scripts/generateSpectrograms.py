@@ -17,8 +17,6 @@ import random
 import matplotlib.pyplot as plt
 from pyAudioAnalysis import audioFeatureExtraction as aF
 from pyAudioAnalysis import audioTrainTest as aT
-from pyAudioAnalysis import audioSegmentation as aS
-from pyAudioAnalysis import audioVisualization as aV
 from pyAudioAnalysis import audioBasicIO
 from pyAudioAnalysis import utilities as uT
 import scipy.io.wavfile as wavfile
@@ -100,17 +98,32 @@ def main(argv):
 		                randStartNoise = random.randrange(0, xnoise.shape[0] - WIDTH_SEC * Fs - 200)
 		                R = 5; xN = (R * x2.astype(float)  + xnoise[randStartNoise : randStartNoise + x2.shape[0]].astype(float)) / float(R+1)
 		                wavfile.write(f.replace(".wav","_rnoise{0:d}1.wav".format(i)), Fs, (16000 * xN).astype('int16'))
-		                createSpectrogramFile(xN, Fs, f.replace(".wav","_rnoise{0:d}1.png".format(i)), stWin, stStep)
+		                #createSpectrogramFile(xN, Fs, f.replace(".wav","_rnoise{0:d}1.png".format(i)), stWin, stStep)
 
 		                randStartNoise = random.randrange(0, xnoise.shape[0] - WIDTH_SEC * Fs - 200)
 		                R = 4; xN = (R * x2.astype(float)  + xnoise[randStartNoise : randStartNoise + x2.shape[0]].astype(float)) / float(R+1)
 		                wavfile.write(f.replace(".wav","_rnoise{0:d}2.wav".format(i)), Fs, (16000 * xN).astype('int16'))
-		                createSpectrogramFile(xN, Fs, f.replace(".wav","_rnoise{0:d}2.png".format(i)), stWin, stStep)
+		                #createSpectrogramFile(xN, Fs, f.replace(".wav","_rnoise{0:d}2.png".format(i)), stWin, stStep)
 
 		                randStartNoise = random.randrange(0, xnoise.shape[0] - WIDTH_SEC * Fs - 200)
 		                R = 3; xN = (R * x2.astype(float)  + xnoise[randStartNoise : randStartNoise + x2.shape[0]].astype(float)) / float(R+1)
 		                wavfile.write(f.replace(".wav","_rnoise{0:d}3.wav".format(i)), Fs, (16000 * xN).astype('int16'))
-		                createSpectrogramFile(xN, Fs, f.replace(".wav","_rnoise{0:d}3.png".format(i)), stWin, stStep)
+		                #createSpectrogramFile(xN, Fs, f.replace(".wav","_rnoise{0:d}3.png".format(i)), stWin, stStep)
+		                
+		                randStartNoise = random.randrange(0, xnoise.shape[0] - WIDTH_SEC * Fs - 200)
+		                R = 6; xN = (R * x2.astype(float)  + xnoise[randStartNoise : randStartNoise + x2.shape[0]].astype(float)) / float(R+1)
+		                wavfile.write(f.replace(".wav","_rnoise{0:d}4.wav".format(i)), Fs, (16000 * xN).astype('int16'))
+		                #createSpectrogramFile(xN, Fs, f.replace(".wav","_rnoise{0:d}4.png".format(i)), stWin, stStep)
+
+		                randStartNoise = random.randrange(0, xnoise.shape[0] - WIDTH_SEC * Fs - 200)
+		                R = 2; xN = (R * x2.astype(float)  + xnoise[randStartNoise : randStartNoise + x2.shape[0]].astype(float)) / float(R+1)
+		                wavfile.write(f.replace(".wav","_rnoise{0:d}5.wav".format(i)), Fs, (16000 * xN).astype('int16'))
+		                #createSpectrogramFile(xN, Fs, f.replace(".wav","_rnoise{0:d}5.png".format(i)), stWin, stStep)
+
+		                randStartNoise = random.randrange(0, xnoise.shape[0] - WIDTH_SEC * Fs - 200)
+		                R = 1; xN = (R * x2.astype(float)  + xnoise[randStartNoise : randStartNoise + x2.shape[0]].astype(float)) / float(R+1)
+		                wavfile.write(f.replace(".wav","_rnoise{0:d}6.wav".format(i)), Fs, (16000 * xN).astype('int16'))
+		                #createSpectrogramFile(xN, Fs, f.replace(".wav","_rnoise{0:d}6.png".format(i)), stWin, stStep)
 
 		                #specgramOr, TimeAxis, FreqAxis = aF.stSpectogram(x2, Fs, round(Fs * stWin), round(Fs * stStep), False)
 		                #im2 = Image.fromarray(numpy.uint8(matplotlib.cm.jet(specgram)*255))
